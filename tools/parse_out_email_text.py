@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 from nltk.stem.snowball import SnowballStemmer
+from sklearn.feature_extraction.text import CountVectorizer
 import string
+
 
 def parseOutText(f):
     """ given an opened email file f, parse out all text below the
@@ -16,39 +18,35 @@ def parseOutText(f):
         
         """
 
-
     f.seek(0)  ### go back to beginning of file (annoying)
     all_text = f.read()
-
-    ### split off metadata
+    # initiate stemmer:
+    stemmer = SnowballStemmer('english')
+    # split off metadata
     content = all_text.split("X-FileName:")
-    words = ""
+    words = ''
+    output = ''
     if len(content) > 1:
-        ### remove punctuation
+        # remove punctuation
         text_string = content[1].translate(string.maketrans("", ""), string.punctuation)
+        # project part 2: comment out the line below
+        # words = text_string
+        words = text_string.replace('\t','').replace('\n','').replace('\r','')
+        for word in text_string:
 
-        ### project part 2: comment out the line below
-        words = text_string
+            output += word +''
+            # split the text string into individual words, stem each word,
+            # and append the stemmed word to words (make sure there's a single
+            # space between each stemmed word)
+    return output
 
-        ### split the text string into individual words, stem each word,
-        ### and append the stemmed word to words (make sure there's a single
-        ### space between each stemmed word)
-        
-
-
-
-
-    return words
-
-    
 
 def main():
     ff = open("../text_learning/test_email.txt", "r")
     text = parseOutText(ff)
     print text
-
+    ff.close()
 
 
 if __name__ == '__main__':
     main()
-
