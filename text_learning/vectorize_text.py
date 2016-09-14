@@ -7,6 +7,8 @@ import sys
 
 sys.path.append("../tools/")
 from parse_out_email_text import parseOutText
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 """
     Starter code to process the emails from Sara and Chris to extract
@@ -33,40 +35,40 @@ word_data = []
 # can take a long time
 # temp_counter helps you only look at the first 200 emails in the list so you
 # can iterate your modifications quicker
-temp_counter = 0
+#temp_counter = 0
 
 for (name, from_person) in [("sara", from_sara), ("chris", from_chris)]:
     for path in from_person:
         # only look at first 200 emails when developing
         # once everything is working, remove this line to run over full dataset
-        temp_counter += 1
-        if temp_counter < 200:
-            path = os.path.join('..', path[:-1])
-            email = open(path, "r")
-            # use parseOutText to extract the text from the opened email
-            sample = parseOutText(email)
-            # use str.replace() to remove any instances of the words
-            for var in ["sara", "shackleton", "chris", "germani"]:
-                text = sample.replace(var, '')
+        # temp_counter += 1
+        # if temp_counter < 100:
+        path = os.path.join('..', path[:-1])
+        email = open(path, "r")
+        # use parseOutText to extract the text from the opened email
+        sample = parseOutText(email)
+        # use str.replace() to remove any instances of the word
+        for var in ["sara", "shackleton", "chris", "germani"]:
+            sample = sample.replace(var, '')
 
             # append the text to word_data
-            word_data.append(text)
-            # append a 0 to from_data if email is from Sara, and 1 if email is from Chris
-            if name == 'chris':
-                from_data.append(1)
-            else:
-                from_data.append(0)
 
-            email.close()
+        word_data.append(sample)
+        # append a 0 to from_data if email is from Sara, and 1 if email is from Chris
+    if name == 'chris':
+        from_data.append(1)
+    else:
+        from_data.append(0)
+
+    email.close()
 
 print "emails processed"
 from_sara.close()
 from_chris.close()
 pickle.dump(word_data, open("your_word_data.pkl", "w"))
 pickle.dump(from_data, open("your_email_authors.pkl", "w"))
-
-
-
-
-
 ### in Part 4, do TfIdf vectorization here
+vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(word_data)
+print len(vectorizer.get_feature_names())
+print (vectorizer.get_feature_names()[34597])
